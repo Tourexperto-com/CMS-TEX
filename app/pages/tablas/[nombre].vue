@@ -41,6 +41,7 @@ if (!tabla) {
 //         return []
 //     })
 
+
 // Data hardcodeada
 const getDataForEndpoint = async () => {
     try {
