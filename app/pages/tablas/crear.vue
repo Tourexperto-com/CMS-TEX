@@ -103,8 +103,23 @@ const handleSubmit = async () => {
 
     try {
         const dataToSubmit = prepareDataForSubmit()
+
+        Object.keys(dataToSubmit).forEach(key => {
+             if (dataToSubmit[key] === '') {
+                dataToSubmit[key] = null
+             }
+        })
+
+        const res = await fetch('/api/blogs/create', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataToSubmit)
+        })
         console.log('Datos a enviar:', dataToSubmit)
 
+        const json = await res.json()
+        console.log('Respuesta del servidor:', json)
+        
         await router.push(`/tablas/${tablaSlug}`)
 
     } catch (error) {

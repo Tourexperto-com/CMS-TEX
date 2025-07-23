@@ -42,28 +42,40 @@ if (!tabla) {
 //         return []
 //     })
 
+const tableData = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`/api/${tabla.endpoint}`)
+    tableData.value = res.ok ? await res.json() : []
+  } catch (err) {
+    console.error('Error cargando datos:', err)
+    tableData.value = []
+  }
+})
+
 // Data hardcodeada
-const getDataForEndpoint = async () => {
-    try {
-        const modules = import.meta.glob('~/shared/**/*.js', { eager: false })
-        const modulePath = `/shared/${tabla.endpoint}.js`
+// const getDataForEndpoint = async () => {
+//     try {
+//         const modules = import.meta.glob('~/shared/**/*.js', { eager: false })
+//         const modulePath = `/shared/${tabla.endpoint}.js`
 
-        const moduleImporter = modules[modulePath]
-        if (moduleImporter) {
-            const module = await moduleImporter()
-            return module.default || []
-        }
+//         const moduleImporter = modules[modulePath]
+//         if (moduleImporter) {
+//             const module = await moduleImporter()
+//             return module.default || []
+//         }
 
-        console.warn(`No se encontró archivo para endpoint: ${tabla.endpoint}`)
-        return []
-    } catch (error) {
-        console.warn(`Error cargando datos para endpoint: ${tabla.endpoint}`)
-        console.error('Error detallado:', error)
-        return []
-    }
-}
+//         console.warn(`No se encontró archivo para endpoint: ${tabla.endpoint}`)
+//         return []
+//     } catch (error) {
+//         console.warn(`Error cargando datos para endpoint: ${tabla.endpoint}`)
+//         console.error('Error detallado:', error)
+//         return []
+//     }
+// }
 
-const tableData = ref(await getDataForEndpoint())
+// const tableData = ref(await getDataForEndpoint())
 
 const displayData = computed(() => tableData.value || [])
 
@@ -78,6 +90,13 @@ const handleEdit = (item) => {
 const handleDelete = async (item) => {
     try {
         // Aquí puedes implementar tu lógica de eliminación
+        const res = await fetch(`/api/blogs/delete`, {
+            method: 'DELETE', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: item.id })
+        })
+        const result = await res.json()
+        console.log('Respuesta de borrado:', result)
         console.log(`Item de ${tabla.name} eliminado correctamente`)
 
         // Actualizar los datos después de eliminar
